@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@v4
+
+    - run: |
+        git config --global user.email "deploy@github.com" && \
+        git config --global user.name "deploy" && \
+        git pull && \
+        mkdir -p /tmp/build && \
+        npm install && \
+        npm run build && \
+        git checkout deploy && \
+        mv .git dist/* /tmp/build && \
+        cd /tmp/build && \
+        >> .nojekyll && \
+        git add . && \
+        git commit -m "Deploy build artifacts" && \
+        git push --force
